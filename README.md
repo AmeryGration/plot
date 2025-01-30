@@ -1,4 +1,4 @@
 Plot
 ====
 
-Plotting utilities.
+Plotting utilities for Python.
