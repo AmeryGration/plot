@@ -5,12 +5,9 @@ import scipy as sp
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 import matplotlib.colors as colors
-import histogram
 
 from matplotlib.ticker import LogFormatterExponent
 from matplotlib.ticker import NullFormatter
-
-# import utils
 
 CENTIMETER = 1./2.54
 
@@ -191,219 +188,61 @@ def array(nrows=1, ncols=1, aspect=1.4142135623730951,
 
     return res
 
-# def corner(n=2):
-#     """Return blank corner plot
+if __name__ == "__main__":
+    plt.style.use("sm")
 
-#     Margins are fixed, and within those margins are drawn either
-#     (1) the axes of a corner plot, or 
-#     (2) the axes of a corner plot and a colour bar.
+    # Plot
+    x = np.linspace(-2.*np.pi, 2.*np.pi)
+    y = np.sin(x)
 
-#     """
-#     fig_width = 16.8*CENTIMETER
-#     left_margin = 1.2*CENTIMETER
-#     right_margin = 1.2*CENTIMETER
-#     bottom_margin = 1.*CENTIMETER
-#     top_margin = 0.5*CENTIMETER
+    fig, ax = plot()
+    ax.plot(x, y)
+    plt.show()
 
-#     plot_width = fig_width - left_margin - right_margin    
-
-#     n_rows = n_cols = n
-#     width_ratios = [1.]*n_cols
-#     aspect = n_cols/n_rows
-#     plot_height = plot_width/aspect
-
-#     fig_height= plot_height + bottom_margin + top_margin
-#     left = left_margin/fig_width
-#     right = (left_margin + plot_width)/fig_width
-#     bottom = bottom_margin/fig_height
-#     top = (bottom_margin + plot_height)/fig_height
-
-#     n_rows = n_cols = n
-#     # Make figure
-#     gridspec_kw = {
-#         "width_ratios": width_ratios, 
-#         "wspace": 0.15,
-#         "hspace": 0.15,
-#         "left": left,
-#         "bottom": bottom,
-#         "right": right,
-#         "top": top,
-#     }
-
-#     fig, ax = plt.subplots(
-#         n_rows,
-#         n_cols,
-#         figsize=(fig_width, fig_height),
-#         gridspec_kw=gridspec_kw
-#     )
-
-#     for i in range(n):
-#         for j in range(i + 1, n):
-#             ax[i][j].set_axis_off()
-
-#     return fig, ax
+    # Plot with colorbar
+    x = np.linspace(0., 1.)
+    y = np.linspace(0., 1.)
+    xx, yy = np.meshgrid(x, y)
+    zz = xx*yy
     
-# def histogram3d(sample,
-#                 bins=10,
-#                 range=None, # As for histogramdd but D = 3
-#                 normed=None, # As for histogramdd but D = 3
-#                 weights=None, # As for histogramdd
-#                 density=False, # As for histogramdd
-#                 norm=None,
-#                 coord_sys="cartesian",
-#                 xscale=None,
-#                 yscale=None,
-#                 vmin_1d=None,
-#                 vmax_1d=None,
-#                 xlabel=None,
-#                 ylabel=None):
-#     sample = np.asarray(sample)
-#     N, D = sample.shape
+    fig, ax, cbar = plot(cbar=True)
+    im = ax.pcolormesh(xx, yy, zz)
+    fig.colorbar(im, cax=cbar)
 
-#     if (isinstance(xscale, str)):
-#         xscale = 3*[xscale]
-#     if (isinstance(ylabel, str)):
-#         ylabel = 3*[ylabel]
+    plt.show()
 
-#     # Compute marginalized histograms
-#     if coord_sys == "cartesian":
-#         coord_diag = [["x"], ["y"], ["z"]]
-#         coord_offdiag = [["x", "y"], ["x", "z"], ["y", "z"]]
-#     elif coord_sys == "cylindrical":
-#         coord_diag = [["rho"], ["phi"], ["z"]]
-#         coord_offdiag = [["rho", "phi"], ["rho", "z"], ["phi", "z"]]
-#     elif coord_sys == "spherical":
-#         coord_diag = [["r"], ["theta"],["phi"]]
-#         coord_offdiag = [["r", "theta"], ["r", "phi"], ["theta", "phi"]]
-#     else:
-#         raise ValueError("'coord_sys' must be one of 'cartesian', "
-#                          "'cylindrical', or 'spherical'.")
+    # Array
+    x = np.linspace(-2.*np.pi, 2.*np.pi)
+    y_0 = np.sin(x)
+    y_1 = np.cos(x)
+    
+    fig, ax = array(2, 1)
+    ax[0][0].plot(x, y)
+    ax[0][0].set_xlabel(r"$x$")
+    ax[0][0].set_ylabel(r"$\sin(x)$")
+    ax[0][1].plot(x, y_1)
+    ax[0][1].set_xlabel(r"$x$")
+    ax[0][1].set_ylabel(r"$\cos(x)$")
+    fig.align_ylabels(ax[0,:])
+    fig.savefig("array.pdf")
+    plt.show()
 
-#     hist = histogram.Histogram3d(
-#         sample, bins, range, normed, weights, density, coord_sys
-#     )
-#     hist_diag = [hist.marginalized_histogram(coord) for coord in coord_diag]
-#     hist_offdiag = [
-#         hist.marginalized_histogram(coord) for coord in coord_offdiag
-#     ]
-
-#     # Find common limits for on- and off-diagonal plots
-#     if vmin_1d is None:
-#         vmin_1d = np.nanmin([hist[0] for hist in hist_diag])
-#     if vmax_1d is None:
-#         vmax_1d = np.nanmax([hist[0] for hist in hist_diag])
-#     vmin_2d = np.nanmin([hist[0] for hist in hist_offdiag])
-#     vmax_2d = np.nanmax([hist[0] for hist in hist_offdiag])
-
-#     if norm is None:
-#         norm = colors.Normalize()
-#     elif norm is colors.LogNorm or "log":
-#         # Minimum cannot be zero
-#         if vmin_1d == 0.:
-#             vmin_1d = None
-#         if vmin_2d == 0.:
-#             vmin_2d = None
-#     # norm = norm(vmin_2d, vmax_2d)    
-
-#     # Create plot axes
-#     fig, ax = corner(D)
-
-#     # Populate plot axes
-#     n = 0 # Keep track of off-diagonal histogram index
-#     for i in np.arange(D):
-#         for j in np.arange(i + 1):
-#             if j < i:
-#                 im = ax[i][j].pcolormesh(
-#                     *hist_offdiag[n][1], hist_offdiag[n][0].T, norm=norm,
-#                     rasterized=True, cmap="Greys",
-#                     vmin=vmin_2d, vmax=vmax_2d
-#                 )
-#                 ax[i][j].set_aspect("auto")
-#                 n += 1
-#             else:
-#                 ax[i][j].stairs(hist_diag[i][0], hist_diag[i][1])
-#                 ax[i][j].set_ylim(vmin_1d, vmax_1d)
-#                 if yscale:
-#                     ax[i][j].set_yscale(yscale)
-#             if xscale:
-#                 ax[i][j].set_yscale(xscale[i])
-#                 ax[i][j].set_xscale(xscale[j])
-#             if i < D - 1:
-#                 # Command ax.set_xticklabels() does not work with log x-scale
-#                 ax[i][j].xaxis.set_major_formatter(NullFormatter())
-#                 ax[i][j].xaxis.set_minor_formatter(NullFormatter())
-#             else:
-#                 if xlabel:
-#                     ax[i][j].set_xlabel(xlabel[j])
-#             if j > 0:
-#                 # Command ax.set_yticklabels() does not work with log y-scale
-#                 ax[i][j].yaxis.set_major_formatter(NullFormatter())
-#                 ax[i][j].yaxis.set_minor_formatter(NullFormatter())
-#             else:
-#                 if ylabel:
-#                     ax[i][j].set_ylabel(ylabel[i])
-#     # fig.colorbar(im, cbar)
-#     # cbar.set_ylabel(ylabel[0])
-
-#     return fig
-
-# if __name__ == "__main__":
-#     plt.style.use("sm")
-
-#     x_min = 1.e-2
-#     x_max = 1.
-#     y_min = 0.
-#     y_max = 1.
-#     z_min = 0.
-#     z_max = 1.
-
-#     sample = sp.stats.multivariate_normal([0., 0., 0.], np.eye(3)).rvs(100_000)
-#     n_bins = 25
-#     bins = [
-#         np.logspace(np.log10(x_min), np.log10(x_max), n_bins),
-#         np.linspace(y_min, y_max, n_bins),
-#         np.linspace(z_min, z_max, n_bins)
-#     ]
-#     fig = histogram3d(sample,
-#                       bins,
-#                       coord_sys="cartesian",
-#                       xscale=["log", "linear", "linear"],
-#                       yscale="log",
-#                       norm="log",
-#                       xlabel=[r"$x$/kpc", r"$y$/kpc", r"$z$/kpc"],
-#                       ylabel=[r"$\nu$", r"$y$/kpc", r"$z$/kpc"]
-#                       )
-#     plt.savefig("test.pdf")
-#     plt.show()
-
-#     R_min = 1.e-2
-#     R_max = 10.
-#     phi_min = -np.pi
-#     phi_max = np.pi
-#     z_min = 1.e-2
-#     z_max = 10.
-
-#     sample = sp.stats.multivariate_normal(np.zeros(6), np.eye(6)).rvs(100_000)
-#     sample = utils.cartesian_to_cylindrical(sample).T[:3].T
-#     n_bins = 25
-#     bins = np.array([
-#         np.logspace(np.log10(R_min), np.log10(R_max), n_bins),
-#         np.linspace(phi_min, phi_max, n_bins),
-#         # np.linspace(z_min, z_max, n_bins)
-#         np.logspace(np.log10(z_min), np.log10(z_max), n_bins)
-#     ])
-#     fig = histogram3d(
-#         sample,
-#         bins,
-#         coord_sys="cylindrical",                      
-#         xscale=["log", "linear", "log"],
-#         yscale="log",
-#         norm="log",
-#         xlabel=[r"$R$/kpc", r"$\phi$", r"$|z|$/kpc"],
-#         ylabel=[r"$\hat{f}$", r"$\phi$", r"$|z|$/kpc"],
-#         vmax_1d=1.e1,
-#         vmin_1d=1.e-8,
-#         density=True
-#     )
-#     plt.savefig("test.pdf")
-#     plt.show()
+    # Array with colorbar
+    x = np.linspace(0., 1.)
+    y = np.linspace(0., 1.)
+    xx, yy = np.meshgrid(x, y)
+    zz_0 = xx*yy
+    zz_1 = xx/yy
+    
+    fig, ax, cbar = array(2, 1, cbar=True)
+    im = ax[0][0].pcolormesh(xx, yy, zz_0, rasterized=True)
+    ax[0][0].set_xlabel(r"$x$")
+    ax[0][0].set_ylabel(r"$y$")
+    ax[0][1].pcolormesh(xx, yy, zz_1, rasterized=True)
+    ax[0][1].set_xlabel(r"$x$")
+    ax[0][1].set_ylabel(r"$y$")
+    fig.colorbar(im, cax=cbar)
+    cbar.set_ylabel(r"$z$")
+    fig.savefig("array_cbar.pdf")
+    
+    plt.show()
