@@ -189,8 +189,6 @@ def array(nrows=1, ncols=1, aspect=1.4142135623730951,
     return res
 
 if __name__ == "__main__":
-    plt.style.use("sm")
-
     # Plot
     x = np.linspace(-2.*np.pi, 2.*np.pi)
     y = np.sin(x)
