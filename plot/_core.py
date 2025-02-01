@@ -446,9 +446,19 @@ if __name__ == "__main__":
     cbar.set_ylabel(r"$z$")
     fig.savefig("array_cbar.pdf")
     plt.show()
- 
-    fig, ax, cbar = array_with_colorbars(2, 1)
-    plt.show()
+
+    # Array with colorbars
+    x = np.linspace(0., 1.)
+    y = np.linspace(0., 1.)
+    xx, yy = np.meshgrid(x, y)
+    zz = xx*yy
 
     fig, ax, cbar = array_with_colorbars(2, 3)
+    for (ax_i, cbar_i) in zip(ax.flatten(), cbar.flatten()):
+        im = ax_i.pcolormesh(xx, yy, zz_0, rasterized=True)
+        ax_i.set_xlabel(r"$x$")
+        ax_i.set_ylabel(r"$y$")
+        fig.colorbar(im, cax=cbar_i)
+        cbar_i.set_ylabel(r"$z$")
+    fig.savefig("array_cbars.pdf")
     plt.show()
