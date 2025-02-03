@@ -2,6 +2,7 @@
 
 import numpy as np
 import scipy as sp
+
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 import matplotlib.colors as colors
@@ -13,28 +14,33 @@ CENTIMETER = 1./2.54
 
 MNRAS_COLUMN_WIDTH = 8.45*CENTIMETER
 MNRAS_GUTTER_WIDTH = 0.8*CENTIMETER
-# MNRAS_COLUMN_HEIGHT = 23.9*CENTIMETER
+MNRAS_COLUMN_HEIGHT = 23.9*CENTIMETER
 
-def plot(aspect=1.4142135623730951, left_margin=0.4724409448818897,
-         right_margin=0.4724409448818897, bottom_margin=0.39370078740157477,
-         top_margin=0.39370078740157477):
+LEFT_MARGIN = 0.4724409448818897
+RIGHT_MARGIN = 0.4724409448818897
+BOTTOM_MARGIN = 0.39370078740157477
+TOP_MARGIN = 0.39370078740157477
+CBAR_WIDTH = 0.15748031496062992
+CBAR_PADDING = 0.23622047244094488
+
+def plot(aspect=1.4142135623730951):
     """Return a single blank plot
 
     The width of a figure is always that of a column in MNRAS (8.45
     cm). 
 
     """    
-    plot_width = MNRAS_COLUMN_WIDTH - left_margin - right_margin
+    plot_width = MNRAS_COLUMN_WIDTH - LEFT_MARGIN - RIGHT_MARGIN
     n_rows = 1
     n_cols = 1
     width_ratios = (1.,)
     plot_height = plot_width/aspect
     fig_width = MNRAS_COLUMN_WIDTH
-    fig_height = bottom_margin + plot_height + top_margin
-    left = left_margin/fig_width
-    right = (fig_width - right_margin)/fig_width
-    bottom = bottom_margin/fig_height
-    top = (fig_height - top_margin)/fig_height
+    fig_height = BOTTOM_MARGIN + plot_height + TOP_MARGIN
+    left = LEFT_MARGIN/fig_width
+    right = (fig_width - RIGHT_MARGIN)/fig_width
+    bottom = BOTTOM_MARGIN/fig_height
+    top = (fig_height - TOP_MARGIN)/fig_height
 
     # Make figure
     fig = plt.figure(figsize=(fig_width, fig_height))
@@ -53,13 +59,7 @@ def plot(aspect=1.4142135623730951, left_margin=0.4724409448818897,
 
     return res
 
-def plot_with_colorbar(aspect=1.4142135623730951,
-                       left_margin=0.4724409448818897,
-                       right_margin=0.4724409448818897,
-                       bottom_margin=0.39370078740157477,
-                       top_margin=0.39370078740157477,
-                       cbar_width=0.15748031496062992,
-                       cbar_padding=0.15748031496062992):
+def plot_with_colorbar(aspect=1.4142135623730951):
     """Return a single blank plot with a color bar
 
     The width of a figure is always that of a column in MNRAS (8.45
@@ -67,19 +67,19 @@ def plot_with_colorbar(aspect=1.4142135623730951,
 
     """    
     plot_width = (
-        MNRAS_COLUMN_WIDTH - left_margin - right_margin - cbar_width
-        - cbar_padding
+        MNRAS_COLUMN_WIDTH - LEFT_MARGIN - RIGHT_MARGIN - CBAR_WIDTH
+        - CBAR_PADDING
     )
     n_rows = 1        
     n_cols = 3
-    width_ratios = (plot_width, cbar_width, cbar_width)
+    width_ratios = (plot_width, CBAR_PADDING, CBAR_WIDTH)
     plot_height = plot_width/aspect
     fig_width = MNRAS_COLUMN_WIDTH
-    fig_height = bottom_margin + plot_height + top_margin
-    left = left_margin/fig_width
-    right = (fig_width - right_margin)/fig_width
-    bottom = bottom_margin/fig_height
-    top = (fig_height - top_margin)/fig_height
+    fig_height = BOTTOM_MARGIN + plot_height + TOP_MARGIN
+    left = LEFT_MARGIN/fig_width
+    right = (fig_width - RIGHT_MARGIN)/fig_width
+    bottom = BOTTOM_MARGIN/fig_height
+    top = (fig_height - TOP_MARGIN)/fig_height
 
     # Make figure
     fig = plt.figure(figsize=(fig_width, fig_height))
@@ -99,10 +99,8 @@ def plot_with_colorbar(aspect=1.4142135623730951,
 
     return res
 
-def array(nrows=1, ncols=1, aspect=1.4142135623730951,
-          left_margin=0.4724409448818897, right_margin=0.4724409448818897,
-          bottom_margin=0.39370078740157477, top_margin=0.39370078740157477,
-          sharex=False, sharey=False, wspace=0.4724409448818897,
+def array(nrows=1, ncols=1, aspect=1.4142135623730951, sharex=False,
+          sharey=False, wspace=0.4724409448818897,
           hspace=0.39370078740157477):
     """Return an array of blank plots
 
@@ -117,7 +115,7 @@ def array(nrows=1, ncols=1, aspect=1.4142135623730951,
     else:
         fig_width = 2.*MNRAS_COLUMN_WIDTH + MNRAS_GUTTER_WIDTH
     plot_width = (
-        (fig_width - left_margin - right_margin - (ncols - 1)*wspace)/ncols
+        (fig_width - LEFT_MARGIN - RIGHT_MARGIN - (ncols - 1)*wspace)/ncols
     )
     width_ratio = (ncols - 1)*(plot_width, wspace) + (plot_width,)
     ncols_ = 2*ncols - 1
@@ -133,13 +131,15 @@ def array(nrows=1, ncols=1, aspect=1.4142135623730951,
     fig_height = (
         nrows*plot_height
         + (nrows - 1)*hspace
-        + bottom_margin
-        + top_margin
+        + BOTTOM_MARGIN
+        + TOP_MARGIN
     )
-    left = left_margin/fig_width
-    right = (fig_width - right_margin)/fig_width
-    bottom = bottom_margin/fig_height
-    top = (fig_height - top_margin)/fig_height
+    if fig_height > MNRAS_COLUMN_HEIGHT:
+        raise ValueError("figure height exceeds MNRAS column height.")
+    left = LEFT_MARGIN/fig_width
+    right = (fig_width - RIGHT_MARGIN)/fig_width
+    bottom = BOTTOM_MARGIN/fig_height
+    top = (fig_height - TOP_MARGIN)/fig_height
     
     # Make figure
     fig = plt.figure(figsize=(fig_width, fig_height))
@@ -173,29 +173,14 @@ def array(nrows=1, ncols=1, aspect=1.4142135623730951,
                 ax_j.sharey(ax[0, i])
                 # Tick labels on left axes only
                 ax_j.yaxis.set_tick_params(labelleft=False)
-    # if xlabel is not None:
-    #     xlabel = np.atleast_1d(xlabel)
-    #     for i, ax_i in enumerate(ax[:, -1]):
-    #         ax_i.set_xlabel(xlabel[i])
-    # if ylabel is not None:
-    #     ylabel = np.atleast_1d(ylabel)
-    #     for i, ax_i in enumerate(ax[0, :]):
-    #         ax_i.set_ylabel(ylabel[i])
-
-    # fig.align_ylabels(ax[0,:])
     res = fig, ax
 
     return res
 
 def array_with_colorbar(nrows=1, ncols=1, aspect=1.4142135623730951,
-                        left_margin=0.4724409448818897,
-                        right_margin=0.4724409448818897,
-                        bottom_margin=0.39370078740157477,
-                        top_margin=0.39370078740157477, sharex=False,
-                        sharey=False, wspace=0.4724409448818897,
-                        hspace=0.39370078740157477,
-                        cbar_width=0.15748031496062992,
-                        cbar_padding=0.15748031496062992):
+                        sharex=False, sharey=False,
+                        wspace=0.4724409448818897,
+                        hspace=0.39370078740157477):
     """Return an array of blank plots along with a global colorbar
 
     If `ncols = 1` then the width of a figure is always that of a
@@ -209,13 +194,13 @@ def array_with_colorbar(nrows=1, ncols=1, aspect=1.4142135623730951,
     else:
         fig_width = 2.*MNRAS_COLUMN_WIDTH + MNRAS_GUTTER_WIDTH
     plot_width = (
-        (fig_width - left_margin - right_margin - (ncols - 1)*wspace
-         - cbar_width - cbar_padding)
+        (fig_width - LEFT_MARGIN - RIGHT_MARGIN - (ncols - 1)*wspace
+         - CBAR_WIDTH - CBAR_PADDING)
         /ncols
     )
     width_ratio = (
-        (ncols - 1)*(plot_width, wspace) + (plot_width,)
-        + (0.5*cbar_padding,) + (cbar_width,)
+        (ncols - 1)*(plot_width, wspace) + (plot_width,) + (CBAR_PADDING,)
+        + (CBAR_WIDTH,)
     )
     ncols_ = 2*ncols + 1
     plot_height = plot_width/aspect
@@ -228,13 +213,15 @@ def array_with_colorbar(nrows=1, ncols=1, aspect=1.4142135623730951,
     fig_height = (
         nrows*plot_height
         + (nrows - 1)*hspace
-        + bottom_margin
-        + top_margin
+        + BOTTOM_MARGIN
+        + TOP_MARGIN
     )
-    left = left_margin/fig_width
-    right = (fig_width - right_margin)/fig_width
-    bottom = bottom_margin/fig_height
-    top = (fig_height - top_margin)/fig_height
+    if fig_height > MNRAS_COLUMN_HEIGHT:
+        raise ValueError("figure height exceeds MNRAS column height.")
+    left = LEFT_MARGIN/fig_width
+    right = (fig_width - RIGHT_MARGIN)/fig_width
+    bottom = BOTTOM_MARGIN/fig_height
+    top = (fig_height - TOP_MARGIN)/fig_height
     
     # Make figure
     fig = plt.figure(figsize=(fig_width, fig_height))
@@ -254,6 +241,16 @@ def array_with_colorbar(nrows=1, ncols=1, aspect=1.4142135623730951,
         [[fig.add_subplot(gs[i, j]) for i in np.arange(0, 2*nrows, 2)]
          for j in np.arange(0, 2*ncols, 2)]
     )
+    if hspace == 0.:
+        for j in range(ax.shape[1]):
+            for i in range(ax.shape[0]):
+                if j != ax.shape[1] - 1:
+                    ax[i][j].set_xticklabels([])
+    if wspace == 0.:
+        for j in range(ax.shape[1]):
+            for i in range(ax.shape[0]):
+                if i != 0:
+                    ax[i][j].set_yticklabels([])
     if sharex:
         for j in np.arange(0, ncols):
             for i, ax_i in enumerate(ax[j, :-1]):
@@ -268,34 +265,20 @@ def array_with_colorbar(nrows=1, ncols=1, aspect=1.4142135623730951,
                 ax_j.sharey(ax[0, i])
                 # Tick labels on left axes only
                 ax_j.yaxis.set_tick_params(labelleft=False)
-    # if xlabel is not None:
-    #     xlabel = np.atleast_1d(xlabel)
-    #     for i, ax_i in enumerate(ax[:, -1]):
-    #         ax_i.set_xlabel(xlabel[i])
-    # if ylabel is not None:
-    #     ylabel = np.atleast_1d(ylabel)
-    #     for i, ax_i in enumerate(ax[0, :]):
-    #         ax_i.set_ylabel(ylabel[i])
-
-    # fig.align_ylabels(ax[0,:])
-    
     cbar = fig.add_subplot(gs[0:,-1])
+    cbar.set_xticks([])
+    cbar.set_yticklabels([])
+
     res = fig, ax, cbar
 
     return res
 
 def array_with_colorbars(nrows=1, ncols=1, aspect=1.4142135623730951,
-                         left_margin=0.4724409448818897,
-                         right_margin=0.4724409448818897,
-                         bottom_margin=0.39370078740157477,
-                         top_margin=0.39370078740157477, sharex=False,
-                         sharey=False, wspace=0.9448818897637794,
-                         hspace=0.39370078740157477,
-                         cbar_width=0.15748031496062992,
-                         cbar_padding=0.15748031496062992):
+                         sharex=False, sharey=False,
+                         wspace=0.7086614173228345,
+                         hspace=0.39370078740157477):
     """Return an array of blank plots each with a global colorbar
 
-    
     If `ncols = 1` then the width of a figure is always that of a
     column in MNRAS (8.45 cm). Otherwise it is the width of two
     columns (16.9 cm) plus the gutter (0.8 cm) in MNRAS (17.7
@@ -306,11 +289,19 @@ def array_with_colorbars(nrows=1, ncols=1, aspect=1.4142135623730951,
         fig_width = MNRAS_COLUMN_WIDTH
     else:
         fig_width = 2.*MNRAS_COLUMN_WIDTH + MNRAS_GUTTER_WIDTH
-    plot_width = (
-        (fig_width - left_margin - right_margin - (ncols - 1)*wspace)
-        /ncols
-        - cbar_width - cbar_padding
+
+    # plot_width = (
+    #     (fig_width - LEFT_MARGIN - RIGHT_MARGIN - (ncols - 1)*wspace)
+    #     /ncols
+    #     - cbar_width - cbar_padding
+    # )
+    panel_width = (
+        (fig_width - LEFT_MARGIN - RIGHT_MARGIN - (ncols - 1)*wspace)/ncols
     )
+    plot_width = panel_width*5./6.
+    cbar_padding = panel_width*0.6/6.
+    cbar_width = panel_width*0.4/6.
+    
     width_ratio = (
         (ncols - 1)*(plot_width, cbar_padding, cbar_width, wspace)
         + (plot_width, cbar_padding, cbar_width)
@@ -327,13 +318,15 @@ def array_with_colorbars(nrows=1, ncols=1, aspect=1.4142135623730951,
     fig_height = (
         nrows*plot_height
         + (nrows - 1)*hspace
-        + bottom_margin
-        + top_margin
+        + BOTTOM_MARGIN
+        + TOP_MARGIN
     )
-    left = left_margin/fig_width
-    right = (fig_width - right_margin)/fig_width
-    bottom = bottom_margin/fig_height
-    top = (fig_height - top_margin)/fig_height
+    if fig_height > MNRAS_COLUMN_HEIGHT:
+        raise ValueError("figure height exceeds MNRAS column height.")
+    left = LEFT_MARGIN/fig_width
+    right = (fig_width - RIGHT_MARGIN)/fig_width
+    bottom = BOTTOM_MARGIN/fig_height
+    top = (fig_height - TOP_MARGIN)/fig_height
     
     # Make figure
     fig = plt.figure(figsize=(fig_width, fig_height))
@@ -371,16 +364,6 @@ def array_with_colorbars(nrows=1, ncols=1, aspect=1.4142135623730951,
                 ax_j.sharey(ax[0, i])
                 # Tick labels on left axes only
                 ax_j.yaxis.set_tick_params(labelleft=False)
-    # if xlabel is not None:
-    #     xlabel = np.atleast_1d(xlabel)
-    #     for i, ax_i in enumerate(ax[:, -1]):
-    #         ax_i.set_xlabel(xlabel[i])
-    # if ylabel is not None:
-    #     ylabel = np.atleast_1d(ylabel)
-    #     for i, ax_i in enumerate(ax[0, :]):
-    #         ax_i.set_ylabel(ylabel[i])
-
-    # fig.align_ylabels(ax[0,:])
     res = fig, ax, cbar
 
     return res
@@ -404,7 +387,7 @@ if __name__ == "__main__":
     zz = xx*yy
     
     fig, ax, cbar = plot_with_colorbar()
-    im = ax.pcolormesh(xx, yy, zz, rasterized=True)
+    im = ax.pcolormesh(xx, yy, zz, rasterized=True, cmap="jet")
     ax.set_xlabel(r"$x$")
     ax.set_ylabel(r"$y$")    
     fig.colorbar(im, cax=cbar)
@@ -424,7 +407,7 @@ if __name__ == "__main__":
     ax[0][1].plot(x, y_1)
     ax[0][1].set_xlabel(r"$x$")
     ax[0][1].set_ylabel(r"$\cos(x)$")
-    # fig.align_ylabels(ax[0,:])
+    fig.align_ylabels(ax[0,:])
     fig.savefig("array.pdf")
     plt.show()
 
@@ -432,16 +415,13 @@ if __name__ == "__main__":
     x = np.linspace(0., 1.)
     y = np.linspace(0., 1.)
     xx, yy = np.meshgrid(x, y)
-    zz_0 = xx*yy
-    zz_1 = xx/yy
+    zz = xx*yy
     
-    fig, ax, cbar = array_with_colorbar(2, 1)
-    im = ax[0][0].pcolormesh(xx, yy, zz_0, rasterized=True)
-    ax[0][0].set_xlabel(r"$x$")
-    ax[0][0].set_ylabel(r"$y$")
-    ax[0][1].pcolormesh(xx, yy, zz_1, rasterized=True)
-    ax[0][1].set_xlabel(r"$x$")
-    ax[0][1].set_ylabel(r"$y$")
+    fig, ax, cbar = array_with_colorbar(1, 2)
+    for ax_i in ax.flatten():
+        im = ax_i.pcolormesh(xx, yy, zz, rasterized=True, cmap="jet")
+        ax_i.set_xlabel(r"$x$")
+        ax_i.set_ylabel(r"$y$")
     fig.colorbar(im, cax=cbar)
     cbar.set_ylabel(r"$z$")
     fig.savefig("array_cbar.pdf")
@@ -453,12 +433,13 @@ if __name__ == "__main__":
     xx, yy = np.meshgrid(x, y)
     zz = xx*yy
 
-    fig, ax, cbar = array_with_colorbars(2, 3)
+    fig, ax, cbar = array_with_colorbars(5, 3)
     for (ax_i, cbar_i) in zip(ax.flatten(), cbar.flatten()):
-        im = ax_i.pcolormesh(xx, yy, zz_0, rasterized=True)
+        im = ax_i.pcolormesh(xx, yy, zz, rasterized=True, cmap="jet")
         ax_i.set_xlabel(r"$x$")
         ax_i.set_ylabel(r"$y$")
         fig.colorbar(im, cax=cbar_i)
         cbar_i.set_ylabel(r"$z$")
+    fig.align_ylabels(ax[[0, 1, 2],:])
     fig.savefig("array_cbars.pdf")
     plt.show()
