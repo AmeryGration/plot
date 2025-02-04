@@ -375,6 +375,7 @@ if __name__ == "__main__":
 
     fig, ax = plot()
     ax.plot(x, y)
+    ax.set_ylim(-1., 1.)
     ax.set_xlabel(r"$x$")
     ax.set_ylabel(r"$y$")    
     fig.savefig("plot.pdf")
@@ -402,9 +403,11 @@ if __name__ == "__main__":
     
     fig, ax = array(2, 1)
     ax[0][0].plot(x, y_0)
+    ax[0][0].set_ylim(-1., 1.)
     ax[0][0].set_xlabel(r"$x$")
     ax[0][0].set_ylabel(r"$\sin(x)$")
     ax[0][1].plot(x, y_1)
+    ax[0][1].set_ylim(-1., 1.)
     ax[0][1].set_xlabel(r"$x$")
     ax[0][1].set_ylabel(r"$\cos(x)$")
     fig.align_ylabels(ax[0,:])
